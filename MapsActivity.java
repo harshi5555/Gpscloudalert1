@@ -47,7 +47,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import org.json.JSONObject;
+
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -55,9 +55,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import static android.content.ContentValues.TAG;
+
 import static com.gpscloudalert.R.id.map;
-import static com.gpscloudalert.R.id.title;
+
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback,
         GoogleMap.OnMapClickListener,
@@ -101,12 +101,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private double distan;
     private  String address;
     private Location geoLocation;
-    // Create a Intent send by the notification
-    public static Intent makeNotificationIntent(Context context, String msg) {
-        Intent intent = new Intent(context, MapsActivity.class);
-        intent.putExtra(NOTIFICATION_MSG, msg);
-        return intent;
-    }
+
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,26 +115,35 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .findFragmentById(map);
         mapFragment.getMapAsync(this);
 
+
+
+
+        initialized();
+        createGoogleApi();
+       // populateGeofenceList();
+
+
+
+
+    }
+    // Create a Intent send by the notification
+    public static Intent createNotificationIntent(Context context, String msg) {
+        Intent intent = new Intent(context, MapsActivity.class);
+        intent.putExtra(NOTIFICATION_MSG, msg);
+        return intent;}
+
+    // initialized textview and array
+    private void initialized(){
         log = (TextView) findViewById(R.id.lat);
         lat = (TextView) findViewById(R.id.lont);
         dist = (TextView) findViewById(R.id.distance);
         mGeofenceList = new ArrayList<Geofence>();
         requestQueue = Volley.newRequestQueue(this);
 
-        // populateGeofenceList();
-
-
-        createGoogleApi();
-      
-
-
-        // Location currentLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
-
-        // distanceInMeters=lastLocation.distanceTo(mLocation);
-
-
     }
 
+
+   // create GoogleApi
     private void createGoogleApi() {
         Log.d(TAG, "createGoogleApi()");
         if (googleApiClient == null) {
@@ -154,25 +161,18 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap = googleMap;
         mMap.setOnMapClickListener(this);
         mMap.setOnMarkerClickListener(this);
-
-        //LatLng stockholm = new LatLng(59, 18);
         mMap.setMyLocationEnabled(true);
-
-        //mMap.addMarker(new MarkerOptions().position(new LatLng(latL,lon)).title("Marker "));
-
-
-        //mMap.setMaxZoomPreference(14.0f );
         LatLng stockholm =new LatLng(latL,lon);
         address = getAddress(this,latL,lon);
+        //add marker and the address to the location
         mMap.addMarker(new MarkerOptions().position(stockholm).title(address));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(stockholm));
         startGeofence();
 
 
-// Register the listener with the Location Manager to receive location updates
+          // Register the listener with the Location Manager to receive location updates
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
 
             return;
         }
@@ -222,11 +222,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onLocationChanged(Location location) {
         lastLocation = location;
-
         markerForLocation(new LatLng(location.getLatitude(),location.getLongitude()));
         //mMap.addMarker(new MarkerOptions().position(new LatLng(latL,lon)).title("Marker "));
         writeActualLocation(location);
-        countDistance(lastLocation,geoLocation);
+
         // startGeofence();
 
 
@@ -404,7 +403,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
     //Method to calculate the distance in between the two geo locations
     private void countDistance(Location lastLocation,Location geoLocation) {
-        float results[] = new float[10];
+        float results[] = new float[1];
         Location.distanceBetween(lastLocation.getLatitude(), lastLocation.getLongitude(), geoLocation.getLatitude(), geoLocation.getLongitude(), results);
         if(results[0] >= 1000 )
             distance = Float.toString(results[0]/1000 ) + " Km";
@@ -419,6 +418,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
     private Geofence createGeofence(LatLng latLng, float radius) {
         Log.d(TAG, "createGeofence");
+        List geofenceList = new ArrayList();
         return new Geofence.Builder()
                 .setRequestId(GEOFENCE_REQ_ID)
                 .setCircularRegion(latLng.latitude, latLng.longitude, radius)
@@ -503,7 +503,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
 
-    public void populateGeofenceList() {
+   /* public void populateGeofenceList() {
         for (Map.Entry<String, LatLng> entry : Constants.LANDMARKS.entrySet()) {
             mGeofenceList.add(new Geofence.Builder()
                     .setRequestId(entry.getKey())
@@ -518,7 +518,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     .build());
         }
 
-    }
+    }*/
     public String getAddress(Context ctx,double latL, double lon){
         String fullAdd =null;
         Geocoder geocoder = new Geocoder(ctx, Locale.getDefault());

@@ -21,7 +21,7 @@ import com.google.android.gms.location.GeofencingEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.gpscloudalert.MapsActivity.makeNotificationIntent;
+import static com.gpscloudalert.MapsActivity.createNotificationIntent;
 
 public class GeofenceTrasitionIntentService extends IntentService {
 
@@ -77,7 +77,7 @@ public class GeofenceTrasitionIntentService extends IntentService {
         Log.i(TAG, "sendNotification: " + msg );
 
         // Intent to start the main Activity
-        Intent notificationIntent = MapsActivity.makeNotificationIntent(
+        Intent notificationIntent = MapsActivity.createNotificationIntent(
                 getApplicationContext(), msg
         );
 
